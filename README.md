@@ -1,93 +1,246 @@
 # OpenHaardVuur
 
+Kerst project: open haard vuur animatie op een OLED display.
 
+## Hardware
 
-## Getting started
+You need:
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- 1 x Raspberry Pi PICO-W of PICO
+- 1 x OLED display 128 x 64 pixel (16 rows yellow, 48 rows blue)
+- 4 x Dupont cable female-female
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+(Alternatively you can also use a breadboard and other cable types.)
 
-## Add your files
+## Hardware Setup
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+> Before making any connections, make sure your Raspberry Pi Pico is powered-off.
 
+You need to make these four connections:
+
+| RasPi Pico | OLED display | function |
+| ----       | ----         | ----     |
+| GND        | GND          | Ground (0V, required to close the circuit) |
+| GP4        | SDA          | I2C Serial Data |
+| GP5        | SCK          | I2C Serial Clock |
+| 3V3        | VDD          | Power Supply (3.3V) for the OLED display |
+
+## Software
+
+You need:
+
+- Python (we tested with 3.11 or later)
+- PyCharm Community Edition (we tested with 2024.1.14 or later)
+
+If you installed these already, you are good to go, otherwise we'll install them in the next section.
+
+- Optional: Git (then you can clone the repository instead of downloading and unpacking a ZIP file)
+
+## Project Setup
+
+We install the necessary tools to build the project and make the necessary settings to build and flash it.
+
+1. Get this project (download a ZIP file and unpack it somewhere, or use git to clone it.)
+   - Pro Tip:
+       - Make a top-level 'Repo' directory on your computer your development repositories,
+         (e.g. in `C:\Repo`).
+       - Make a folder `gitlab` and clone (or unpack from a ZIP file) this project within
+         (e.g. in `C:\Repo\gitlab\openhaardvuur`).
+
+2. Install Python (e.g. 3.12 or later) on your computer.
+   - Pro Tip:
+       - make a top-level 'Dev' directory on your computer for all your development software,
+         (e.g. in `C:\Dev`).
+       - make a folder `Python` and install Python inside this folder
+         (e.g. in `C:\Dev\Python\Python3.12`),
+         so you can have multiple Python versions if you need them.
+
+3. Install the current version of the PyCharm Community Edition (e.g. 2024.1.4)
+   (e.g. in `C:\Dev\JetBrains\PyCharm-CE-2024.1.4`).
+
+4. Open PyCharm and choose 'Project' > 'Open' from the launcher
+   (or [Three-lines Menu] > 'File' > 'Open' from the main window if you have an open project already),
+   then find the `pico` folder in the `openhaardvuur` folder and open it
+   (in our example this is in `C:\Repo\gitlab\openhaardvuur\pico`).
+
+5. Check or install the PyCharm plugin for MicroPython:
+   - Navigate to the [PyCharm Menu] > 'Settings' > 'Plugins'
+   - if it is not already installed: get 'MicroPython' from the 'Marketplace'
+
+6. Select a Python Interpreter for the project:
+   - Navigate to the [PyCharm Menu] > 'Settings' > 'Project: openhaardvuur' > 'Python Interpreter'.
+   - Select the Python interpreter you installed in Step 2.
+   - If the interpreter is not shown in the drop-down list, find it with 'Add'.
+
+7. Enable MicroPython for the 'openhaardvuur' project:
+   - Navigate to the [PyCharm Menu] > 'Settings' > 'Languages and Frameworks' > 'MicroPython'
+   - Enable (check) 'Enable MicroPython support'
+   - For 'Device type:' select 'Raspberry Pi Pico'
+   - Enable (check) 'Auto-detect device path'
+   - Click 'Apply' and then 'OK'
+
+8. Mark the 'Sources Root' folder in your project:
+   - In PyCharm, in the 'Project' window, below 'openhaardvuur', right-click on the folder 'pico'
+   - From the context menu, select 'Mark Directory as' > 'Sources Root'.
+   - The folder icon for 'pico' should now be blue.
+   This tells MicroPython that only this directory (and all files and folders within) must be
+   copied to the Raspberry Pi Pico. It also makes sure that 'main.py' is in the Pico's "root folder".
+   On Power-Up, the Raspberry Pi Pico will check if it has a 'main.py' in its root folder.
+   If you place your project 'main.py' somewhere else, it will not be executed.
+   > If you change your code and flash it to the Raspberry Pi Pico, but it looks like
+   > your changes are not executed, check if this setting is correct.
+
+9. Create a 'Run Configuration' for flashing everything to the Pico:
+   - In PyCharm, in the Main window, on the top right, left of a gray 'Play' button is a dropdown
+     that shows 'Current File' (at least for a new project).
+   - Select this dropdown, and you should see the options 'Current File' and 'Edit Configurations...'.
+   - Choose 'Edit Configurations...', and the dialog window 'Run/Debug Configurations' should open.
+   - Add a new configuration with the '+' (plus) sign (it's top-left, under the PyCharm icon).
+   - Select 'MicroPython'. This opens 'MicroPython/Flash' settings.
+   - In the 'Name:' field (shows 'Flash') change the text to 'Flash pico'.
+   - Right of the (empty) 'Path:' field is a small folder icon. Click on it and browse to the location
+     of your 'pico' folder e.g. `C:\Repo\gitlab\openhaardvuur\pico`.
+   - Optional: you can enable 'Open MicroPython REPL on success', but we don't necessarily need it for this project.
+   - In any case, leave the other settings untouched (the entry 'Before launch: Stop MIcroPython REPL' is important to keep).
+   - Click 'Apply' and 'OK'.
+
+## Build and Flash
+
+Phew. The preparation took quite some steps!
+
+At least now it should be easy to upload (flash) the project to the Raspberry Pi Pico.
+
+1. **Make sure your Raspberry Pi Pico is configured with MicroPython.** (When you get this project, this should already be the case.)
+
+   If you have a brand-new never-touched Raspberry Pi Pico (or Pico-W), you need to download the matching MicroPython package for it.
+
+   Installing this is not difficult (you basically copy a file into a folder on the Pico).
+
+   But you do need to make sure you have the correct MicroPython variant for your Pico type.
+
+2. **Make sure your Raspberry Pi Pico is connected to your Laptop/PC via USB.**
+
+3. In PyCharm, in the Main window, on the top right, left of a gray 'Play' button, make sure you have 'Flash pico' selected.
+   (If not, select it from the dropdown. If it's not there, check the 'Project Setup' step to make this 'Run Configuration'.)  
+   **Then press the 'Play' button.**
+
+You should now get a 'Run' window with the name '[Micropython logo] Flash pico' that shows something like this:
+
+```text
+C:/Dev/Python/Python312/python.exe C:\Users\testuser\AppData\Roaming\JetBrains\PyCharmCE2024.1\plugins\intellij-micropython/scripts/microupload.py -C C:/Repo/gitlab/openhaardvuur/pico -v COM17 C:\Repo\gitlab\openhaardvuur\pico
+Connecting to COM17
+Uploading files: 0% (0/6)
+C:\Repo\gitlab\openhaardvuur\pico\main.py -> main.py
+Uploading files: 16% (1/6)
+C:\Repo\gitlab\openhaardvuur\pico\ssd1309.py -> ssd1309.py
+Uploading files: 33% (2/6)
+C:\Repo\gitlab\openhaardvuur\pico\px128w64h\vuur0.mono -> px128w64h/vuur0.mono
+Uploading files: 50% (3/6)
+C:\Repo\gitlab\openhaardvuur\pico\px128w64h\vuur1.mono -> px128w64h/vuur1.mono
+Uploading files: 66% (4/6)
+C:\Repo\gitlab\openhaardvuur\pico\px128w64h\vuur2.mono -> px128w64h/vuur2.mono
+Uploading files: 83% (5/6)
+C:\Repo\gitlab\openhaardvuur\pico\px128w64h\vuur3.mono -> px128w64h/vuur3.mono
+Uploading files: 100% (6/6)
+Soft reboot
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/ict-ti/openhaardvuur.git
-git branch -M main
-git push -uf origin main
+
+If you enabled 'Open MicroPython REPL on success', you will only see this output for a brief moment, then you get the MicroPython REPL screen.
+
+If you did not enable 'Open MicroPython REPL on success', you can open it now by clicking on the MicroPython symbol on the left of the output window.
+
+```text
+Device path COM17
+Quit: Ctrl+] | Stop program: Ctrl+C | Reset: Ctrl+D
+Type 'help()' (without the quotes) then press ENTER.
+Traceback (most recent call last):
+  File "main.py", line 107, in <module>
+KeyboardInterrupt: 
+MicroPython v1.19.1 on 2022-06-18; Raspberry Pi Pico with RP2040
+Type "help()" for more information.
+>>> 
 ```
 
-## Integrate with your tools
+Opening the MicroPython REPL will stop program execution.
+On the OLED display you will probably see the 'welcome screen' of the project, with some text on it.
 
-- [ ] [Set up project integrations](https://gitlab.com/ict-ti/openhaardvuur/-/settings/integrations)
+You can now click inside the REPL window and type some commands, for example:
 
-## Collaborate with your team
+```text
+>>> dir()
+['I2C', 'i2c', 'prepare_fireplace_animation', 'machine', 'I2C_SDA', 'FRAME_SLEEP', 'pico_selftest', 'display', 'I2C_FRQ', 'show_welcome_banner', 'rp2', 'test_fireplace_animation', 'play_fireplace_animation', 'sleep_ms', 'Display', 'Pin', '__name__', 'I2C_SCL']
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Like on the normal Python REPL (on your PC), you can also use your Raspberry Pi Pico as a little calculator:
 
-## Test and Deploy
+```text
+>>> 2 + 7
+9
+```
 
-Use the built-in continuous integration in GitLab.
+Hmmm... but how do we run our program again?
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Try this:
 
-***
+```text
+>>> import main
+```
 
-# Editing this README
+Tip: If you click on the 'Play' icon on the left of the output window (hover tip 'Run'), you are taken back to the 'Run' 'Flash pico' screen with the information about flashing.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Files on the Raspberry Pi Pico
 
-## Suggestions for a good README
+MicroPython supports a file system. The files and directories on there can be listed and changed via a program (or the REPL) via the 'os' package.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+The layout of the files we flash onto the Pico looks like this:
 
-## Name
-Choose a self-explaining name for your project.
+- MicroPython root file system ('Sources Root')
+  - `main.py` -- our main program, this is automatically executed by the Raspberry Pi Pico (and the Pico-W) on power-up
+  - `ssd1309.py` -- the library that main.py uses to talk to the OLED 128 x 64 pixel display
+  - `px128w64h` -- directory with bitmap files for a display that is 128 pixels wide and 64 pixels high
+    - `vuur0.mono` -- 1st animation frame of the 'fire' animation
+    - `vuur1.mono` -- 2nd animation frame of the 'fire' animation
+    - `vuur2.mono` -- 3rd animation frame of the 'fire' animation
+    - `vuur3.mono` -- 4th animation frame of the 'fire' animation
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### Tips & Tricks and FAQs
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Q: **Flashing takes so long. Can we make this faster?**
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+A: If you don't want to flash all files all the time, you can add more 'Run/Debug Configurations'.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+- For development it's useful to add a configurations 'Flash main.py' to flash only the file main.py.
+- Instead of a directory, in 'Path:' you just select the file you want to flash in the configuration dialog.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Q: **Is there another way to open the MIcroPython REPL?**
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+A: Sure! You can also do this with [PyCharm Menu] > 'Tools' > 'MicroPython' > 'MicroPython REPL'
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+----
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+Q: **Can I clean up my Raspberry Pi Pico, i.e. delete all files I flashed onto it?**
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+A: Yes, you can! See [Pycharm Menu] > 'Tools' > 'MicroPython' > 'Remove All Files from MicroPython Device'
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+----
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Q: **Why do Pico and Pico-W need different MicroPython variants?**
 
-## License
-For open source projects, say how it is licensed.
+A: The Raspberry Pi Pico-W has an additional WiFi-chip, and the MicroPython software needs to 'know' about it.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- At the heart of the Raspberry Pi Pico is the RP2040 microcontroller. The Pico-W has tha same RP2040 plus an additional WiFi-chip.
+  Controlling the WiFi-chip requires a few connections. In the Pico-W schematic it says these are GPIO 23, 24, 25 and 29.
+
+- Example: Both Pico variants have a 'built-in' LED that we can use in our programs.
+
+  - On the Raspberry Pi Pico, the 'built-in' LED is connected to GPIO 25. We can let the LED 'blink' with a few simple GPIO port commands.
+
+  - On the Raspberry Pi Pico-W, GPIO 25 is already used, and the LED is connected to the WiFi-chip. Turning it on or off means the RP2040 has to 'talk' to the WiFi-chip and ask it to turn the LED on or off. Luckily we don't need to care about this detail, the MicroPython variant for the Pico-W understands the string `'LED'` in place of a GPIO port number and will handle all the difficult parts for us.
+
+Q: **Can I make my own bitmap files?**
+
+A: Yes, you can. There are programs and also online converters to make a monochrome bitmap file (*.mono) from pictures you create with a graphics program (e.g. MS Paint). You can also save the data from a framebuffer into a local file on the Pico. (The program 'Thonny' can show and download files from a MicroPython file system, unfortunately the PyCharm MicroPython plugin cannot do this. With a Pico-W you could of course also set up a web server to do this... :-))
+
+----
+
+Enjoy!

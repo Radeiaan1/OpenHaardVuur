@@ -16,11 +16,11 @@ FRAME_SLEEP = 100
 
 
 def pico_selftest():
-    """BIST (Built-In Self Test).
-       Flash the Raspberry Pi PICO LED three times."""
-    try:  # RasPi PICO-W has a different LED control way
+    """Built-In Self Test (BIST).
+       Flash the built-in LED three times."""
+    try:  # RasPi PICO-W needs to talk to the WiFi-chip for this
         led = Pin("LED", Pin.OUT)
-    except: # RasPi PICO built-in LED is on Pin 25
+    except TypeError:  # RasPi PICO built-in LED is on Pin 25
         led = Pin(25, Pin.OUT)
     for i in range(3):
         led.on()
@@ -31,7 +31,9 @@ def pico_selftest():
 
 def test_fireplace_animation(display):
     """Attempt at generating a fire animation programmatically.
-       (Alas, it does not look very convincing. It is also very slow.)"""
+       (Alas, it does not look very convincing. It is also very slow.)
+       [NOT USED - Left here to experiment with.]
+    """
     from random import random
     WIDTH = 128
     HEIGHT = 64
@@ -67,22 +69,22 @@ def prepare_fireplace_animation(display):
     """Load image data from disk and pre-process it for animation.
        We add each frame and add its mirror image.
        Goal is a better animation for this application (fire)."""
-    fbuf_array = []
+    frame_array = []
     maxi = 0
     for x in range(4):
         # Load a 128x64 monochrome bitmap from a file.
         buf = display.load_buf(f"px128w64h/vuur{x}.mono", 128, 64)
         # Convert the bitmap to a frame buffer.
-        fbuf_array.append(display.make_fb(buf, 128, 64))
+        frame_array.append(display.make_fb(buf, 128, 64))
         maxi += 1
         # Mirror the bitmap and convert the result to a frame buffer.
-        fbuf_array.append(display.make_fb(display.mirror_horizontal(buf, 128, 64), 128, 64))
+        frame_array.append(display.make_fb(display.mirror_horizontal(buf, 128, 64), 128, 64))
         maxi += 1
     # To play the animation forward and back without any duplicates we make
     # a list of the frame numbers to play in order.
-    displaylist = list(range(0, maxi)) + list(range(maxi - 2, 0, -1))
-    # print("show", maxi, "list", displaylist)
-    return fbuf_array, displaylist
+    frame_list = list(range(0, maxi)) + list(range(maxi - 2, 0, -1))
+    # print("show", maxi, "list", frame_list)
+    return frame_array, frame_list
 
 
 def play_fireplace_animation(display, fbuf_array, displaylist):
@@ -106,9 +108,9 @@ display = Display(i2c)
 show_welcome_banner(display)
 sleep_ms(20_000)  # without a delay here we can't read any of it :-)
 # Prepare the animation (we need to do this only one time)
-fbuf_array, displaylist = prepare_fireplace_animation(display)
+frame_array, frame_list = prepare_fireplace_animation(display)
 # Play the fire animation
 while True:  # (forever)
-    play_fireplace_animation(display, fbuf_array, displaylist)
+    play_fireplace_animation(display, frame_array, frame_list)
 
 # eof ########## (end of file)

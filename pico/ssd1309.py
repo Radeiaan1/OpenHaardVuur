@@ -14,8 +14,7 @@
 """
 from math import cos, sin, pi, radians
 from micropython import const
-from framebuf import FrameBuffer, MONO_HLSB, MONO_HMSB, MONO_VLSB
-from utime import sleep_ms
+from framebuf import FrameBuffer, MONO_HMSB, MONO_VLSB
 
 
 def get_byte_size(width):
@@ -325,7 +324,8 @@ class Display(object):
         """Draw an ellipse.
 
         Args:
-            x0, y0 (int): Coordinates of center point.
+            x0 (int): X-coordinate of center point.
+            y0 (int): Y-coordinate of center point.
             a (int): Semi axis horizontal.
             b (int): Semi axis vertical.
             invert (bool): True = clear line, False (Default) = draw line.
@@ -391,7 +391,7 @@ class Display(object):
         """
         if self.is_off_grid(x, y, x + w - 1, y):
             return
-        self.monoFB.hline(x, y, w, int(invert ^ 1))
+        self.monoFB.hline(x, y, w, int(invert) ^ 1)
 
     def draw_letter(self, x, y, letter, font, invert=False, rotate=False):
         """Draw a letter.
@@ -420,8 +420,10 @@ class Display(object):
         """Draw a line using Bresenham's algorithm.
 
         Args:
-            x1, y1 (int): Starting coordinates of the line
-            x2, y2 (int): Ending coordinates of the line
+            x1 (int): Starting X-coordinate of the line
+            y1 (int): Starting Y-coordinate of the line
+            x2 (int): Ending X-coordinate of the line
+            y2 (int): Ending Y-coordinate of the line
             invert (bool): True = clear line, False (Default) = draw line.
         """
         # Check for horizontal line
@@ -440,7 +442,7 @@ class Display(object):
         if self.is_off_grid(min(x1, x2), min(y1, y2),
                             max(x1, x2), max(y1, y2)):
             return
-        self.monoFB.line(x1, y1, x2, y2, invert ^ 1)
+        self.monoFB.line(x1, y1, x2, y2, int(invert) ^ 1)
 
     def draw_lines(self, coords, invert=False):
         """Draw multiple lines.
@@ -467,21 +469,22 @@ class Display(object):
         """
         if self.is_off_grid(x, y, x, y):
             return
-        self.monoFB.pixel(x, y, int(invert ^ 1))
+        self.monoFB.pixel(x, y, int(invert) ^ 1)
 
     def draw_polygon(self, sides, x0, y0, r, invert=False, rotate=0):
         """Draw an n-sided regular polygon.
 
         Args:
             sides (int): Number of polygon sides.
-            x0, y0 (int): Coordinates of center point.
+            x0 (int): X-coordinate of center point.
+            y0 (int): Y-xoordinate of center point.
             r (int): Radius.
             invert (bool): True = clear line, False (Default) = draw line.
             rotate (Optional float): Rotation in degrees relative to origin.
         Note:
             The center point is the center of the x0,y0 pixel.
             Since pixels are not divisible, the radius is integer rounded
-            up to complete on a full pixel.  Therefore diameter = 2 x r + 1.
+            up to complete on a full pixel, therefore diameter = 2 x r + 1.
         """
         coords = []
         theta = radians(rotate)
@@ -503,7 +506,7 @@ class Display(object):
             h (int): Height of rectangle.
             invert (bool): True = clear line, False (Default) = draw line.
         """
-        self.monoFB.rect(x, y, w, h, int(invert ^ 1))
+        self.monoFB.rect(x, y, w, h, int(invert) ^ 1)
 
     def draw_sprite(self, fbuf, x, y, w, h):
         """Draw a sprite.
@@ -542,25 +545,25 @@ class Display(object):
             if rotate == 0:
                 # Fill in spacing
                 if spacing:
-                    self.fill_rectangle(x + w, y, spacing, h, invert ^ 1)
+                    self.fill_rectangle(x + w, y, spacing, h, invert)
                 # Position x for next letter
                 x += (w + spacing)
             elif rotate == 90:
                 # Fill in spacing
                 if spacing:
-                    self.fill_rectangle(x, y + h, w, spacing, invert ^ 1)
+                    self.fill_rectangle(x, y + h, w, spacing, invert)
                 # Position y for next letter
                 y += (h + spacing)
             elif rotate == 180:
                 # Fill in spacing
                 if spacing:
-                    self.fill_rectangle(x - w - spacing, y, spacing, h, invert ^ 1)
+                    self.fill_rectangle(x - w - spacing, y, spacing, h, invert)
                 # Position x for next letter
                 x -= (w + spacing)
             elif rotate == 270:
                 # Fill in spacing
                 if spacing:
-                    self.fill_rectangle(x, y - h - spacing, w, spacing, invert ^ 1)
+                    self.fill_rectangle(x, y - h - spacing, w, spacing, invert)
                 # Position y for next letter
                 y -= (h + spacing)
             else:
@@ -592,7 +595,7 @@ class Display(object):
         # Confirm coordinates in boundary
         if self.is_off_grid(x, y, x, y + h):
             return
-        self.monoFB.vline(x, y, h, int(invert ^ 1))
+        self.monoFB.vline(x, y, h, int(invert) ^ 1)
 
     def fill_circle(self, x0, y0, r, invert=False):
         """Draw a filled circle.
@@ -626,14 +629,15 @@ class Display(object):
         """Draw a filled ellipse.
 
         Args:
-            x0, y0 (int): Coordinates of center point.
+            x0 (int): X-coordinate of center point.
+            y0 (int): Y-coordinate of center point.
             a (int): Semi axis horizontal.
             b (int): Semi axis vertical.
             invert (bool): True = clear line, False (Default) = draw line.
         Note:
             The center point is the center of the x0,y0 pixel.
             Since pixels are not divisible, the axes are integer rounded
-            up to complete on a full pixel.  Therefore the major and
+            up to complete on a full pixel, therefore the major and
             minor axes are increased by 1.
         """
         a2 = a * a
@@ -682,25 +686,26 @@ class Display(object):
             y (int): Starting Y position.
             w (int): Width of rectangle.
             h (int): Height of rectangle.
-            visble (bool): True (Default) = draw line, False = clear line.
+            invert (bool): False (Default) = draw, True = clear.
         """
         if self.is_off_grid(x, y, x + w - 1, y + h - 1):
             return
-        self.monoFB.fill_rect(x, y, w, h, int(invert ^ 1))
+        self.monoFB.fill_rect(x, y, w, h, int(invert) ^ 1)
 
     def fill_polygon(self, sides, x0, y0, r, invert=False, rotate=0):
         """Draw a filled n-sided regular polygon.
 
         Args:
             sides (int): Number of polygon sides.
-            x0, y0 (int): Coordinates of center point.
+            x0 (int): X-coordinate of center point.
+            y0 (int): Y-coordinate of center point.
             r (int): Radius.
-            visble (bool): True (Default) = draw line, False = clear line.
+            invert (bool): False (Default) = draw line, True = clear line.
             rotate (Optional float): Rotation in degrees relative to origin.
         Note:
             The center point is the center of the x0,y0 pixel.
             Since pixels are not divisible, the radius is integer rounded
-            up to complete on a full pixel.  Therefore diameter = 2 x r + 1.
+            up to complete on a full pixel, therefore diameter = 2 x r + 1.
         """
         # Determine side coordinates
         coords = []
@@ -749,7 +754,7 @@ class Display(object):
             error = dx >> 1
             ystep = 1 if y1 < y2 else -1
             y = y1
-            # Calcualte minimum and maximum x values
+            # Calculate minimum and maximum x values
             for x in range(x1, x2 + 1):
                 if is_steep:
                     if x in xdict:
