@@ -6,11 +6,13 @@
 
 Kerst project: open haard vuur animatie op een OLED display.
 
+![Gadget poster](./poster/x-mas-gadget_poster.jfif)
+
 ## Hardware
 
-You need:
+You need the following items. See also our [challange](challange.md) for a walktrough on how to obtain these items.
 
-- 1 x Raspberry Pi PICO-W of PICO
+- 1 x Raspberry Pi PICO or PICO-W
 - 1 x OLED display 128 x 64 pixel (16 rows yellow, 48 rows blue)
 - 4 x Dupont cable female-female
 
@@ -36,7 +38,7 @@ You need:
 - Python (we tested with 3.11 or later)
 - PyCharm Community Edition (we tested with 2024.1.14 or later)
 
-If you installed these already, you are good to go, otherwise we'll install them in the next section.
+If you installed these already, you are [good to go](#build-and-flash), otherwise we'll install them in the next section.
 
 - Optional: Git (then you can clone the repository instead of downloading and unpacking a ZIP file)
 
