@@ -6,7 +6,7 @@
 
 Kerst project: open haard vuur animatie op een OLED display.
 
-![Gadget poster](./poster/x-mas-gadget_poster.png)
+![Gadget poster](./files/poster/x-mas-gadget_poster.png)
 
 ## Hardware
 
@@ -30,6 +30,8 @@ You need to make these four connections:
 | GP4        | SDA          | I2C Serial Data                            |
 | GP5        | SCK          | I2C Serial Clock                           |
 | 3V3        | VDD          | Power Supply (3.3V) for the OLED display   |
+
+![Fritzing schema](./files/openhaardvuur_bb.png)
 
 ## Software
 
