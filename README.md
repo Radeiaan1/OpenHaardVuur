@@ -6,7 +6,7 @@
 
 Kerst project: open haard vuur animatie op een OLED display.
 
-![Gadget poster](./poster/x-mas-gadget_poster.jfif)
+![Gadget poster](./poster/x-mas-gadget_poster.png)
 
 ## Hardware
 
