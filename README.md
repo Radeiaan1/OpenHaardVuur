@@ -10,7 +10,7 @@ Kerst project: open haard vuur animatie op een OLED display.
 
 ## Hardware
 
-You need the following items. See also our [challange](challenge.md) for a walktrough on how to obtain these items.
+You need the following items. See also our [challenge](challenge.md) for a walktrough on how to obtain these items.
 
 - 1 x Raspberry Pi PICO or PICO-W
 - 1 x OLED display 128 x 64 pixel (16 rows yellow, 48 rows blue)
