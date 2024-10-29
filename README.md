@@ -31,6 +31,8 @@ You need to make these four connections:
 | GP5        | SCK          | I2C Serial Clock                           |
 | 3V3        | VDD          | Power Supply (3.3V) for the OLED display   |
 
+Note that on some screens the position of VDD and GND could be switched.
+
 ![Fritzing schema](./files/openhaardvuur_bb.png)
 
 ## Software
